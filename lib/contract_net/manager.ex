@@ -11,4 +11,11 @@ defmodule ContractNet.Manager do
        proposals_accepted: []
      }}
   end
+
+  defp reset_state(state) do
+    state
+    |> Map.put(:status, :idle)
+    |> Map.put(:offers_sent, [])
+    |> Map.put(:proposals_received, [])
+  end
 end
