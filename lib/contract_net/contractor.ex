@@ -18,9 +18,7 @@ defmodule ContractNet.Contractor do
   end
 
   @impl true
-  def handle_cast({:chosen, sender}, state) do
-    GenServer.cast(sender, {:offer, self(), state.proposal})
-
-    {:noreply, state}
+  def handle_cast(:chosen, state) do
+    {:noreply, %{state | chosen: true}}
   end
 end
