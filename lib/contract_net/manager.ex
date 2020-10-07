@@ -12,6 +12,10 @@ defmodule ContractNet.Manager do
      }}
   end
 
+  defp select_winner(proposals) do
+    Enum.max(proposals)
+  end
+
   defp reset_state(state) do
     state
     |> Map.put(:status, :idle)
