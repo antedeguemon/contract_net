@@ -28,12 +28,14 @@ defmodule ContractNet.Manager do
 
   @impl true
   def handle_cast(:auction_ended, state) do
-    winner_proposal = select_winner(state.proposals_received)
+    {winner_pid, proposal} = select_winner(state.proposals_received)
 
     updated_state =
       state
       |> reset_state()
-      |> Map.put(:proposals_accepted, [winner_proposal] ++ state.proposals_accepted)
+      |> Map.put(:proposals_accepted, [proposal] ++ state.proposals_accepted)
+
+    GenServer.cast(winner_pid, :chosen)
 
     {:noreply, %{state | state: updated_state}}
   end
