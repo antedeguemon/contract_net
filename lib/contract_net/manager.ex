@@ -2,7 +2,10 @@ defmodule ContractNet.Manager do
   use GenServer
 
   @impl true
-  def init(_) do
+  def init(opts \\ []) do
+    group_name = Keyword.get(opts, :group_name, :agents)
+    :pg2.create(group_name)
+
     {:ok,
      %{
        status: :idle,
