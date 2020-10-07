@@ -39,7 +39,7 @@ defmodule ContractNet.Manager do
   end
 
   defp select_winner(proposals) do
-    Enum.max(proposals)
+    Enum.max_by(proposals, fn {_, value} -> value end)
   end
 
   defp reset_state(state) do
