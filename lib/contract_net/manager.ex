@@ -13,6 +13,17 @@ defmodule ContractNet.Manager do
   end
 
   @impl true
+  def handle_cast({:offer, sender, value}, state) do
+    updated_proposals = [{sender, value}] ++ state.proposals_received
+
+    if received_all_proposals?(updated_proposals, state) do
+      GenServer.cast(self(), :auction_ended)
+    end
+
+    {:noreply, %{state | proposals_received: updated_proposals}}
+  end
+
+  @impl true
   def handle_cast(:auction_ended, state) do
     winner_proposal = select_winner(state.proposals_received)
 
