@@ -1,6 +1,18 @@
 defmodule ContractNet.Manager do
   use GenServer
 
+  # Client
+
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts)
+  end
+
+  def start_auction(pid) do
+    GenServer.cast(pid, :start_auction)
+  end
+
+  # Server
+
   @impl true
   def init(opts \\ []) do
     group_name = Keyword.get(opts, :group_name, :agents)
@@ -11,8 +23,21 @@ defmodule ContractNet.Manager do
        status: :idle,
        offers_sent: [],
        proposals_received: [],
-       proposals_accepted: []
+       proposals_accepted: [],
+       group_name: group_name
      }}
+  end
+
+  @impl true
+  def handle_cast(:start_auction, state) do
+    offers_sent =
+      state.group_name
+      |> :pg2.get_members()
+      |> Enum.map(fn pid ->
+        GenServer.cast(pid, {:call_for_proposal, self()})
+      end)
+
+    {:noreply, %{state | status: :auction, offers_sent: offers_sent}}
   end
 
   @impl true
@@ -37,7 +62,7 @@ defmodule ContractNet.Manager do
 
     GenServer.cast(winner_pid, :chosen)
 
-    {:noreply, %{state | state: updated_state}}
+    {:noreply, updated_state}
   end
 
   defp select_winner(proposals) do
